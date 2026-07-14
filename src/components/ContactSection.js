@@ -433,53 +433,144 @@ export default function ContactSection() {
               style={{ transitionDelay: "350ms" }}
             >
               <button
-                type="button"
-                disabled
-                aria-disabled="true"
-                className="
-                  group relative inline-flex min-h-12
-                  cursor-default items-center justify-center
-                  gap-2 overflow-hidden rounded-full
-                  border border-emerald-300/20
-                  bg-emerald-500
-                  px-6 text-sm font-bold text-[#02130d]
-                  shadow-[0_10px_26px_rgba(16,185,129,0.14)]
-                  outline-none
-                  sm:px-8 sm:text-base
-                  sm:shadow-[0_14px_38px_rgba(16,185,129,0.18)]
-                "
-              >
-                <span
-                  aria-hidden="true"
-                  className="
-                    absolute inset-0
-                    bg-gradient-to-r
-                    from-emerald-300/25 via-transparent to-emerald-300/15
-                  "
-                />
+  type="button"
+  aria-label="Contactar por WhatsApp"
+  className="
+    group relative inline-flex min-h-12
+    cursor-pointer items-center justify-center
+    gap-2 overflow-hidden rounded-full
+    border border-emerald-300/25
+    bg-emerald-500
+    px-6 text-sm font-bold text-[#02130d]
+    shadow-[0_10px_26px_rgba(16,185,129,0.14)]
+    outline-none
 
-                <svg
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  aria-hidden="true"
-                  className="relative h-5 w-5"
-                >
-                  <path
-                    d="M20.5 11.6a8.5 8.5 0 0 1-12.7 7.4L3 20.3l1.3-4.6A8.5 8.5 0 1 1 20.5 11.6Z"
-                    stroke="currentColor"
-                    strokeWidth="1.8"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  />
+    transform-gpu
+    transition-[transform,background-color,border-color,box-shadow]
+    duration-300
+    ease-[cubic-bezier(0.16,1,0.3,1)]
 
-                  <path
-                    d="M8.3 8.2c.2-.5.4-.5.8-.5h.5c.2 0 .4 0 .5.4l.8 1.8c.1.3.1.5-.1.7l-.6.7c-.2.2-.1.4 0 .6.7 1.2 1.6 2.1 2.8 2.7.2.1.4.1.6-.1l.8-1c.2-.2.4-.3.7-.2l1.8.9c.3.1.5.3.5.5 0 .3-.2 1.4-1 2-.7.6-1.6.8-2.6.5-1.1-.3-2.5-.9-4.1-2.3-1.3-1.2-2.3-2.7-2.6-3.8-.3-1-.1-2.1.4-2.9Z"
-                    fill="currentColor"
-                  />
-                </svg>
+    hover:-translate-y-1
+    hover:scale-[1.025]
+    hover:border-emerald-200/60
+    hover:bg-emerald-400
+    hover:shadow-[0_18px_42px_rgba(16,185,129,0.30)]
 
-                <span className="relative">Contactar por WhatsApp</span>
-              </button>
+    active:translate-y-0
+    active:scale-[0.96]
+    active:bg-emerald-300
+    active:shadow-[0_6px_16px_rgba(16,185,129,0.22)]
+
+    focus-visible:ring-2
+    focus-visible:ring-emerald-300/70
+    focus-visible:ring-offset-2
+    focus-visible:ring-offset-[#07110e]
+
+    sm:px-8 sm:text-base
+  "
+>
+  {/* Resplandor interior */}
+  <span
+    aria-hidden="true"
+    className="
+      pointer-events-none absolute inset-0
+      bg-gradient-to-r
+      from-emerald-200/30 via-transparent to-emerald-300/20
+      opacity-70
+      transition-opacity duration-300
+      group-hover:opacity-100
+      group-active:opacity-50
+    "
+  />
+
+  {/* Brillo que atraviesa el botón al hacer hover */}
+  <span
+    aria-hidden="true"
+    className="
+      pointer-events-none absolute inset-y-0 -left-1/2
+      w-1/3 skew-x-[-20deg]
+      bg-gradient-to-r
+      from-transparent via-white/45 to-transparent
+      transition-transform duration-700
+      ease-[cubic-bezier(0.16,1,0.3,1)]
+      group-hover:translate-x-[450%]
+    "
+  />
+
+  {/* Círculo de presión */}
+  <span
+    aria-hidden="true"
+    className="
+      pointer-events-none absolute left-1/2 top-1/2
+      h-4 w-4 -translate-x-1/2 -translate-y-1/2
+      rounded-full bg-white/30 opacity-0
+      transition-[transform,opacity] duration-300
+      group-active:scale-[12]
+      group-active:opacity-100
+      group-active:duration-100
+    "
+  />
+
+  <svg
+    viewBox="0 0 24 24"
+    fill="none"
+    aria-hidden="true"
+    className="
+      relative h-5 w-5 transform-gpu
+      transition-transform duration-300
+      group-hover:-rotate-6
+      group-hover:scale-110
+      group-active:rotate-0
+      group-active:scale-90
+    "
+  >
+    <path
+      d="M20.5 11.6a8.5 8.5 0 0 1-12.7 7.4L3 20.3l1.3-4.6A8.5 8.5 0 1 1 20.5 11.6Z"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+
+    <path
+      d="M8.3 8.2c.2-.5.4-.5.8-.5h.5c.2 0 .4 0 .5.4l.8 1.8c.1.3.1.5-.1.7l-.6.7c-.2.2-.1.4 0 .6.7 1.2 1.6 2.1 2.8 2.7.2.1.4.1.6-.1l.8-1c.2-.2.4-.3.7-.2l1.8.9c.3.1.5.3.5.5 0 .3-.2 1.4-1 2-.7.6-1.6.8-2.6.5-1.1-.3-2.5-.9-4.1-2.3-1.3-1.2-2.3-2.7-2.6-3.8-.3-1-.1-2.1.4-2.9Z"
+      fill="currentColor"
+    />
+  </svg>
+
+  <span
+    className="
+      relative transform-gpu
+      transition-transform duration-300
+      group-hover:translate-x-0.5
+      group-active:translate-x-0
+    "
+  >
+    Contactar por WhatsApp
+  </span>
+
+  <svg
+    viewBox="0 0 20 20"
+    fill="none"
+    aria-hidden="true"
+    className="
+      relative h-4 w-4 transform-gpu
+      transition-[transform,opacity] duration-300
+      group-hover:translate-x-1
+      group-hover:scale-110
+      group-active:translate-x-0
+      group-active:scale-90
+    "
+  >
+    <path
+      d="M4 10h11M11 6l4 4-4 4"
+      stroke="currentColor"
+      strokeWidth="1.8"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+    />
+  </svg>
+</button>
             </div>
 
             {/* Indicador inferior */}

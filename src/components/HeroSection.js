@@ -1,6 +1,5 @@
 "use client";
 
-import Link from "next/link";
 import {
   useLayoutEffect,
   useRef,
@@ -12,6 +11,14 @@ import UnlockCoreMockup from "@/components/UnlockCoreMockup";
 export default function HeroSection() {
   const heroRef = useRef(null);
   const [visible, setVisible] = useState(false);
+
+  const [hoverServicios, setHoverServicios] = useState(false);
+  const [hoverContactar, setHoverContactar] = useState(false);
+  const [presionadoServicios, setPresionadoServicios] = useState(false);
+  const [presionadoContactar, setPresionadoContactar] = useState(false);
+
+  const serviciosTimeoutRef = useRef(null);
+  const contactarTimeoutRef = useRef(null);
 
   useLayoutEffect(() => {
     const hero = heroRef.current;
@@ -164,28 +171,109 @@ export default function HeroSection() {
     };
   }, []);
 
-  const irAServicios = () => {
-  const seccion = document.getElementById("servicios");
+  useLayoutEffect(() => {
+    const cancelarInteracciones = () => {
+      if (serviciosTimeoutRef.current !== null) {
+        window.clearTimeout(serviciosTimeoutRef.current);
+        serviciosTimeoutRef.current = null;
+      }
 
-  if (!seccion) return;
+      if (contactarTimeoutRef.current !== null) {
+        window.clearTimeout(contactarTimeoutRef.current);
+        contactarTimeoutRef.current = null;
+      }
 
-  const movimientoReducido = window.matchMedia(
-    "(prefers-reduced-motion: reduce)",
-  ).matches;
+      setHoverServicios(false);
+      setHoverContactar(false);
+      setPresionadoServicios(false);
+      setPresionadoContactar(false);
+    };
 
-  const alturaHeader =
-    window.innerWidth >= 640 ? 72 : 68;
+    window.addEventListener("scroll", cancelarInteracciones, {
+      passive: true,
+    });
 
-  const posicion =
-    seccion.getBoundingClientRect().top +
-    window.scrollY -
-    alturaHeader;
+    window.addEventListener("touchmove", cancelarInteracciones, {
+      passive: true,
+    });
 
-  window.scrollTo({
-    top: Math.max(0, posicion),
-    behavior: movimientoReducido ? "auto" : "smooth",
-  });
-};
+    return () => {
+      window.removeEventListener("scroll", cancelarInteracciones);
+      window.removeEventListener("touchmove", cancelarInteracciones);
+
+      if (serviciosTimeoutRef.current !== null) {
+        window.clearTimeout(serviciosTimeoutRef.current);
+      }
+
+      if (contactarTimeoutRef.current !== null) {
+        window.clearTimeout(contactarTimeoutRef.current);
+      }
+    };
+  }, []);
+
+  const activarPresionServicios = () => {
+    if (serviciosTimeoutRef.current !== null) {
+      window.clearTimeout(serviciosTimeoutRef.current);
+    }
+
+    setPresionadoServicios(true);
+  };
+
+  const liberarPresionServicios = () => {
+    if (serviciosTimeoutRef.current !== null) {
+      window.clearTimeout(serviciosTimeoutRef.current);
+    }
+
+    serviciosTimeoutRef.current = window.setTimeout(() => {
+      setPresionadoServicios(false);
+      serviciosTimeoutRef.current = null;
+    }, 120);
+  };
+
+  const activarPresionContactar = () => {
+    if (contactarTimeoutRef.current !== null) {
+      window.clearTimeout(contactarTimeoutRef.current);
+    }
+
+    setPresionadoContactar(true);
+  };
+
+  const liberarPresionContactar = () => {
+    if (contactarTimeoutRef.current !== null) {
+      window.clearTimeout(contactarTimeoutRef.current);
+    }
+
+    contactarTimeoutRef.current = window.setTimeout(() => {
+      setPresionadoContactar(false);
+      contactarTimeoutRef.current = null;
+    }, 120);
+  };
+
+  const irASeccion = (id) => {
+    const seccion = document.getElementById(id);
+
+    if (!seccion) return;
+
+    const movimientoReducido = window.matchMedia(
+      "(prefers-reduced-motion: reduce)",
+    ).matches;
+
+    const alturaHeader =
+      window.innerWidth >= 640 ? 72 : 68;
+
+    const posicion =
+      seccion.getBoundingClientRect().top +
+      window.scrollY -
+      alturaHeader;
+
+    window.scrollTo({
+      top: Math.max(0, posicion),
+      behavior: movimientoReducido ? "auto" : "smooth",
+    });
+  };
+
+  const irAServicios = () => irASeccion("servicios");
+  const irAContacto = () => irASeccion("contacto");
 
   return (
     <section
@@ -666,268 +754,374 @@ export default function HeroSection() {
             `}
           >
             {/* Botón principal */}
-           <button
-  type="button"
-  onClick={irAServicios}
-  className="
-    group
-    relative
-    isolate
-    inline-flex
-    min-h-12
-    touch-manipulation
-    items-center
-    justify-center
-    gap-2
-    overflow-hidden
-    whitespace-nowrap
-    rounded-full
-    border
-    border-emerald-300/20
-    bg-emerald-400
-    px-5
-    py-3
-    text-[13px]
-    font-bold
-    text-[#02130d]
-    outline-none
-    shadow-[0_12px_30px_rgba(16,185,129,0.2)]
+            <button
+              type="button"
+              onClick={irAServicios}
+              onPointerEnter={(event) => {
+                if (event.pointerType === "mouse") {
+                  setHoverServicios(true);
+                }
+              }}
+              onPointerLeave={() => {
+                setHoverServicios(false);
+                setPresionadoServicios(false);
+              }}
+              onPointerDown={(event) => {
+                if (event.pointerType !== "mouse") {
+                  setHoverServicios(false);
+                }
 
-    [-webkit-tap-highlight-color:transparent]
+                activarPresionServicios();
+              }}
+              onPointerUp={liberarPresionServicios}
+              onPointerCancel={() => {
+                setHoverServicios(false);
+                setPresionadoServicios(false);
+              }}
+              onBlur={() => {
+                setHoverServicios(false);
+                setPresionadoServicios(false);
+              }}
+              className={`
+                group/servicios
+                relative
+                isolate
+                inline-flex
+                min-h-12
+                touch-manipulation
+                items-center
+                justify-center
+                gap-2
+                overflow-hidden
+                whitespace-nowrap
+                select-none
+                rounded-full
+                border
+                px-5
+                py-3
+                text-[13px]
+                font-[800]
+                leading-none
+                tracking-[-0.025em]
+                text-[#02130d]
+                outline-none
 
-    transition-[transform,background-color,border-color,box-shadow]
-    duration-200
-    ease-[cubic-bezier(0.16,1,0.3,1)]
+                [-webkit-tap-highlight-color:transparent]
+                [backface-visibility:hidden]
 
-    hover:-translate-y-0.5
-    hover:border-emerald-100/60
-    hover:bg-emerald-300
-    hover:shadow-[0_16px_36px_rgba(16,185,129,0.27)]
+                transition-[transform,background-color,border-color,box-shadow]
+                duration-200
+                ease-[cubic-bezier(0.16,1,0.3,1)]
 
-    active:translate-y-px
-    active:scale-[0.96]
-    active:border-emerald-100/80
-    active:bg-emerald-500
-    active:shadow-[inset_0_2px_6px_rgba(0,0,0,0.2)]
+                focus-visible:ring-2
+                focus-visible:ring-emerald-200
+                focus-visible:ring-offset-2
+                focus-visible:ring-offset-[#050b0a]
 
-    focus-visible:ring-2
-    focus-visible:ring-emerald-200
-    focus-visible:ring-offset-2
-    focus-visible:ring-offset-[#050b0a]
+                motion-reduce:transform-none
+                motion-reduce:transition-none
 
-    motion-reduce:transition-none
+                max-[350px]:gap-1.5
+                max-[350px]:px-3
+                max-[350px]:text-[11px]
 
-    max-[350px]:gap-1.5
-    max-[350px]:px-3
-    max-[350px]:text-[11px]
+                group-data-[compacto=true]:min-h-11
+                group-data-[compacto=true]:px-4
+                group-data-[compacto=true]:py-2.5
+                group-data-[compacto=true]:text-xs
 
-    group-data-[compacto=true]:min-h-11
-    group-data-[compacto=true]:px-4
-    group-data-[compacto=true]:py-2.5
-    group-data-[compacto=true]:text-xs
+                group-data-[muy-compacto=true]:min-h-10
+                group-data-[muy-compacto=true]:px-3
+                group-data-[muy-compacto=true]:py-2
+                group-data-[muy-compacto=true]:text-[10px]
 
-    group-data-[muy-compacto=true]:min-h-10
-    group-data-[muy-compacto=true]:px-3
-    group-data-[muy-compacto=true]:py-2
-    group-data-[muy-compacto=true]:text-[10px]
+                group-data-[horizontal=true]:min-h-11
+                group-data-[horizontal=true]:px-4
+                group-data-[horizontal=true]:py-2.5
+                group-data-[horizontal=true]:text-xs
 
-    group-data-[horizontal=true]:min-h-11
-    group-data-[horizontal=true]:px-4
-    group-data-[horizontal=true]:py-2.5
-    group-data-[horizontal=true]:text-xs
+                sm:min-h-[52px]
+                sm:px-7
+                sm:text-sm
 
-    sm:min-h-[52px]
-    sm:px-7
-    sm:text-sm
-  "
->
-  {/* Resplandor interior al presionar */}
-  <span
-    aria-hidden="true"
-    className="
-      pointer-events-none
-      absolute
-      inset-0
-      scale-75
-      rounded-full
-      bg-[radial-gradient(circle,rgba(255,255,255,0.3)_0%,transparent_70%)]
-      opacity-0
+                ${
+                  presionadoServicios
+                    ? `
+                        translate-y-px
+                        scale-[0.96]
+                        border-emerald-100/80
+                        bg-emerald-500
+                        shadow-[inset_0_2px_6px_rgba(0,0,0,0.2)]
+                      `
+                    : hoverServicios
+                      ? `
+                          -translate-y-0.5
+                          scale-100
+                          border-emerald-100/60
+                          bg-emerald-300
+                          shadow-[0_16px_36px_rgba(16,185,129,0.27)]
+                        `
+                      : `
+                          translate-y-0
+                          scale-100
+                          border-emerald-300/20
+                          bg-emerald-400
+                          shadow-[0_12px_30px_rgba(16,185,129,0.2)]
+                        `
+                }
+              `}
+            >
+              <span
+                aria-hidden="true"
+                className={`
+                  pointer-events-none
+                  absolute
+                  inset-0
+                  rounded-full
+                  bg-[radial-gradient(circle,rgba(255,255,255,0.3)_0%,transparent_70%)]
 
-      transition-[opacity,transform]
-      duration-200
-      ease-out
+                  transition-[opacity,transform]
+                  duration-200
+                  ease-out
 
-      group-active:scale-100
-      group-active:opacity-100
-    "
-  />
+                  ${
+                    presionadoServicios
+                      ? "scale-100 opacity-100"
+                      : "scale-75 opacity-0"
+                  }
+                `}
+              />
 
-  <span
-    className="
-      relative
-      transition-transform
-      duration-200
-      group-active:scale-[0.98]
-    "
-  >
-    Ver servicios
-  </span>
+              <span
+                className={`
+                  relative
+                  transition-transform
+                  duration-200
 
-  <svg
-    viewBox="0 0 24 24"
-    aria-hidden="true"
-    fill="none"
-    className="
-      relative
-      hidden
-      h-4
-      w-4
-      shrink-0
+                  ${
+                    presionadoServicios
+                      ? "scale-[0.98]"
+                      : "scale-100"
+                  }
+                `}
+              >
+                Ver servicios
+              </span>
 
-      transition-transform
-      duration-200
+              <svg
+                viewBox="0 0 24 24"
+                aria-hidden="true"
+                fill="none"
+                className={`
+                  relative
+                  hidden
+                  h-4
+                  w-4
+                  shrink-0
 
-      group-hover:translate-x-0.5
-      group-active:-translate-x-px
-      group-active:scale-90
+                  transition-transform
+                  duration-200
 
-      min-[370px]:block
+                  min-[370px]:block
+                  group-data-[muy-compacto=true]:hidden
 
-      group-data-[muy-compacto=true]:hidden
-    "
-  >
-    <path
-      d="M5 12h14M13 6l6 6-6 6"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-    />
-  </svg>
-</button>
+                  ${
+                    presionadoServicios
+                      ? "-translate-x-px scale-90"
+                      : hoverServicios
+                        ? "translate-x-0.5 scale-100"
+                        : "translate-x-0 scale-100"
+                  }
+                `}
+              >
+                <path
+                  d="M5 12h14M13 6l6 6-6 6"
+                  stroke="currentColor"
+                  strokeWidth="2"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                />
+              </svg>
+            </button>
 
             {/* Botón secundario */}
-         <button
-  type="button"
-  className="
-    group
-    relative
-    isolate
-    inline-flex
-    min-h-12
-    touch-manipulation
-    items-center
-    justify-center
-    overflow-hidden
-    whitespace-nowrap
-    rounded-full
-    border
-    border-white/15
-    bg-white/[0.055]
-    px-5
-    py-3
-    text-[13px]
-    font-semibold
-    text-white
-    outline-none
+            <button
+              type="button"
+              onClick={irAContacto}
+              onPointerEnter={(event) => {
+                if (event.pointerType === "mouse") {
+                  setHoverContactar(true);
+                }
+              }}
+              onPointerLeave={() => {
+                setHoverContactar(false);
+                setPresionadoContactar(false);
+              }}
+              onPointerDown={(event) => {
+                if (event.pointerType !== "mouse") {
+                  setHoverContactar(false);
+                }
 
-    [-webkit-tap-highlight-color:transparent]
+                activarPresionContactar();
+              }}
+              onPointerUp={liberarPresionContactar}
+              onPointerCancel={() => {
+                setHoverContactar(false);
+                setPresionadoContactar(false);
+              }}
+              onBlur={() => {
+                setHoverContactar(false);
+                setPresionadoContactar(false);
+              }}
+              className={`
+                group/contactar
+                relative
+                isolate
+                inline-flex
+                min-h-12
+                touch-manipulation
+                items-center
+                justify-center
+                overflow-hidden
+                whitespace-nowrap
+                select-none
+                rounded-full
+                border
+                px-5
+                py-3
+                text-[13px]
+                font-[700]
+                leading-none
+                tracking-[-0.015em]
+                text-white
+                outline-none
 
-    transition-[transform,background-color,border-color,box-shadow,color]
-    duration-200
-    ease-[cubic-bezier(0.16,1,0.3,1)]
+                [-webkit-tap-highlight-color:transparent]
+                [backface-visibility:hidden]
 
-    hover:-translate-y-0.5
-    hover:border-emerald-400/35
-    hover:bg-emerald-400/[0.09]
-    hover:text-emerald-100
-    hover:shadow-[0_10px_26px_rgba(0,0,0,0.2)]
+                transition-[transform,background-color,border-color,box-shadow,color]
+                duration-200
+                ease-[cubic-bezier(0.16,1,0.3,1)]
 
-    active:translate-y-px
-    active:scale-[0.96]
-    active:border-emerald-300/70
-    active:bg-emerald-400/[0.14]
-    active:text-emerald-100
-    active:shadow-[inset_0_2px_6px_rgba(0,0,0,0.28),0_0_0_3px_rgba(52,211,153,0.12)]
+                focus-visible:ring-2
+                focus-visible:ring-emerald-400/60
+                focus-visible:ring-offset-2
+                focus-visible:ring-offset-[#050b0a]
 
-    focus-visible:ring-2
-    focus-visible:ring-emerald-400/60
-    focus-visible:ring-offset-2
-    focus-visible:ring-offset-[#050b0a]
+                motion-reduce:transform-none
+                motion-reduce:transition-none
 
-    motion-reduce:transition-none
+                max-[350px]:px-3
+                max-[350px]:text-[11px]
 
-    max-[350px]:px-3
-    max-[350px]:text-[11px]
+                group-data-[compacto=true]:min-h-11
+                group-data-[compacto=true]:px-4
+                group-data-[compacto=true]:py-2.5
+                group-data-[compacto=true]:text-xs
 
-    group-data-[compacto=true]:min-h-11
-    group-data-[compacto=true]:px-4
-    group-data-[compacto=true]:py-2.5
-    group-data-[compacto=true]:text-xs
+                group-data-[muy-compacto=true]:min-h-10
+                group-data-[muy-compacto=true]:px-3
+                group-data-[muy-compacto=true]:py-2
+                group-data-[muy-compacto=true]:text-[10px]
 
-    group-data-[muy-compacto=true]:min-h-10
-    group-data-[muy-compacto=true]:px-3
-    group-data-[muy-compacto=true]:py-2
-    group-data-[muy-compacto=true]:text-[10px]
+                group-data-[horizontal=true]:min-h-11
+                group-data-[horizontal=true]:px-4
+                group-data-[horizontal=true]:py-2.5
+                group-data-[horizontal=true]:text-xs
 
-    group-data-[horizontal=true]:min-h-11
-    group-data-[horizontal=true]:px-4
-    group-data-[horizontal=true]:py-2.5
-    group-data-[horizontal=true]:text-xs
+                sm:min-h-[52px]
+                sm:px-7
+                sm:text-sm
 
-    sm:min-h-[52px]
-    sm:px-7
-    sm:text-sm
-  "
->
-  {/* Fondo que aparece al presionar */}
-  <span
-    aria-hidden="true"
-    className="
-      pointer-events-none
-      absolute
-      inset-0
-      -z-10
-      scale-75
-      rounded-full
-      bg-[radial-gradient(circle,rgba(52,211,153,0.22)_0%,transparent_70%)]
-      opacity-0
+                ${
+                  presionadoContactar
+                    ? `
+                        translate-y-px
+                        scale-[0.96]
+                        border-emerald-300/70
+                        bg-emerald-400/[0.14]
+                        text-emerald-100
+                        shadow-[inset_0_2px_6px_rgba(0,0,0,0.28),0_0_0_3px_rgba(52,211,153,0.12)]
+                      `
+                    : hoverContactar
+                      ? `
+                          -translate-y-0.5
+                          scale-100
+                          border-emerald-400/35
+                          bg-emerald-400/[0.09]
+                          text-emerald-100
+                          shadow-[0_10px_26px_rgba(0,0,0,0.2)]
+                        `
+                      : `
+                          translate-y-0
+                          scale-100
+                          border-white/15
+                          bg-white/[0.055]
+                          text-white
+                          shadow-none
+                        `
+                }
+              `}
+            >
+              <span
+                aria-hidden="true"
+                className={`
+                  pointer-events-none
+                  absolute
+                  inset-0
+                  -z-10
+                  rounded-full
+                  bg-[radial-gradient(circle,rgba(52,211,153,0.22)_0%,transparent_70%)]
 
-      transition-[opacity,transform]
-      duration-200
-      ease-out
+                  transition-[opacity,transform]
+                  duration-200
+                  ease-out
 
-      group-active:scale-100
-      group-active:opacity-100
-    "
-  />
+                  ${
+                    presionadoContactar
+                      ? "scale-100 opacity-100"
+                      : "scale-75 opacity-0"
+                  }
+                `}
+              />
 
-  {/* Borde interior que aparece durante el clic */}
-  <span
-    aria-hidden="true"
-    className="
-      pointer-events-none
-      absolute
-      inset-[3px]
-      rounded-full
-      border
-      border-emerald-200/0
-      opacity-0
+              <span
+                aria-hidden="true"
+                className={`
+                  pointer-events-none
+                  absolute
+                  inset-[3px]
+                  rounded-full
+                  border
 
-      transition-[opacity,border-color,transform]
-      duration-200
-      ease-out
+                  transition-[opacity,border-color,transform]
+                  duration-200
+                  ease-out
 
-      group-active:scale-[0.98]
-      group-active:border-emerald-200/40
-      group-active:opacity-100
-    "
-  />
+                  ${
+                    presionadoContactar
+                      ? "scale-[0.98] border-emerald-200/40 opacity-100"
+                      : "scale-100 border-emerald-200/0 opacity-0"
+                  }
+                `}
+              />
 
-  <span className="relative transition-transform duration-200 group-active:scale-[0.98]">
-    Contactar
-  </span>
-</button>
+              <span
+                className={`
+                  relative
+                  transition-transform
+                  duration-200
+
+                  ${
+                    presionadoContactar
+                      ? "scale-[0.98]"
+                      : "scale-100"
+                  }
+                `}
+              >
+                Contactar
+              </span>
+            </button>
           </div>
 
           {/* Beneficios */}
@@ -938,10 +1132,12 @@ export default function HeroSection() {
               flex-wrap
               items-center
               justify-center
-              gap-x-4
-              gap-y-2
-              text-[10px]
-              text-white/40
+              gap-x-5
+              gap-y-2.5
+              text-[11px]
+              font-medium
+              leading-none
+              text-white/50
 
               transition-[opacity,transform]
               duration-600
@@ -951,16 +1147,17 @@ export default function HeroSection() {
               motion-reduce:transition-none
 
               group-data-[compacto=true]:mt-3
-              group-data-[compacto=true]:text-[9px]
+              group-data-[compacto=true]:gap-x-4
+              group-data-[compacto=true]:text-[10px]
 
               group-data-[muy-compacto=true]:hidden
 
               group-data-[horizontal=true]:mt-3
               group-data-[horizontal=true]:gap-x-3
-              group-data-[horizontal=true]:text-[9px]
+              group-data-[horizontal=true]:text-[10px]
 
               sm:mt-5
-              sm:text-xs
+              sm:text-[13px]
 
               ${
                 visible
@@ -971,46 +1168,52 @@ export default function HeroSection() {
           >
             <span className="inline-flex items-center gap-2">
               <span
+                aria-hidden="true"
                 className="
                   flex
-                  h-5
-                  w-5
+                  h-[22px]
+                  w-[22px]
+                  shrink-0
                   items-center
                   justify-center
                   rounded-full
                   border
-                  border-emerald-400/10
-                  bg-emerald-400/[0.08]
-                  text-[11px]
+                  border-emerald-400/15
+                  bg-emerald-400/[0.09]
+                  text-xs
+                  font-bold
                   text-emerald-400
                 "
               >
                 ✓
               </span>
 
-              Atención personalizada
+              <span>Atención personalizada</span>
             </span>
 
             <span className="inline-flex items-center gap-2">
               <span
+                aria-hidden="true"
                 className="
                   flex
-                  h-5
-                  w-5
+                  h-[22px]
+                  w-[22px]
+                  shrink-0
                   items-center
                   justify-center
                   rounded-full
                   border
-                  border-emerald-400/10
-                  bg-emerald-400/[0.08]
-                  text-[11px]
+                  border-emerald-400/15
+                  bg-emerald-400/[0.09]
+                  text-xs
+                  font-bold
                   text-emerald-400
                 "
               >
                 ✓
               </span>
 
-              Procesos seguros
+              <span>Procesos seguros</span>
             </span>
           </div>
         </div>
